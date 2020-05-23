@@ -1,0 +1,7 @@
+name: cesmcatalog-dev
+channels:
+  - conda-forge
+dependencies:
+  - typer
+  - pandas
+  - pytest
