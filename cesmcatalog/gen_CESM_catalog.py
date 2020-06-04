@@ -50,27 +50,24 @@ def _find_data(case_root):
     logger.error('Can not find xmlquery in %s' % case_root)
     sys.exit(1)
 
+  run_config = dict()
+  for var in ['GET_REFCASE', 'RUN_REFCASE']:
+    run_config[var] = subprocess.check_output('./xmlquery --value %s' % var, shell=True)
   DOUT_S = subprocess.check_output('./xmlquery --value DOUT_S', shell=True)
   if DOUT_S == 'TRUE':
-    timeslice_config = dict()
-    for var in ['DOUT_S_ROOT', 'GET_REFCASE', 'RUN_REFCASE']:
-      timeslice_config[var] = subprocess.check_output('./xmlquery --value %s' % var, shell=True)
-    # Proof of concept; show what data we've gleaned
+    DOUT_S_ROOT = subprocess.check_output('./xmlquery --value DOUT_S_ROOT', shell=True)
   else:
-    timeslice_config = None
+    DOUT_S_ROOT = None
 
   # 3. If time series preprocess was used, pull out necessary config data
-  # TODO: is this the best way to determine if time series were generated?
+  # TODO: how do we determine if we actually generated timeseries?
   if os.path.isdir('postprocess'):
-    timeseries_config = dict()
-    for var in ['GET_REFCASE', 'RUN_REFCASE']:
-      timeslice_config[var] = subprocess.check_output('./xmlquery --value %s' %var, shell=True)
     os.chdir('postprocess')
-    timeseries_config['TIMESERIES_OUTPUT_ROOTDIR'] = subprocess.check_output('./pp_config --value --get TIMESERIES_OUTPUT_ROOTDIR', shell=True).rstrip()
+    TIMESERIES_OUTPUT_ROOTDIR = subprocess.check_output('./pp_config --value --get TIMESERIES_OUTPUT_ROOTDIR', shell=True).rstrip()
   else:
-    timeseries_config = None
+    TIMESERIES_OUTPUT_ROOTDIR = None
 
-  return timeslice_config, timeseries_config
+  return run_config, DOUT_S_ROOT, TIMESERIES_OUTPUT_ROOTDIR
 
 ################################################################################
 
@@ -78,18 +75,20 @@ def gen_catalog(case_root):
   logger = logging.getLogger(__name__)
 
   # 1. Find where data is
-  timeslice_config, timeseries_config = _find_data(case_root)
-  if (timeslice_config is None) and (timeseries_config is None):
+  run_config, DOUT_S_ROOT, TIMESERIES_OUTPUT_ROOTDIR = _find_data(case_root)
+  if (DOUT_S_ROOT is None) and (TIMESERIES_OUTPUT_ROOTDIR is None):
     logger.error('Error: can not find any data for %s' % case_root)
     sys.exit(1)
 
-  if timeseries_config:
-    # TODO: generate catalog instead of just printing this
-    logger.info(timeseries_config)
+  logger.info('run_config: %s' % run_config)
 
-  if timeslice_config:
+  if DOUT_S_ROOT:
     # TODO: generate catalog instead of just printing this
-    logger.info(timeslice_config)
+    logger.info('DOUT_S_ROOT: %s' % DOUT_S_ROOT)
+
+  if TIMESERIES_OUTPUT_ROOTDIR:
+    # TODO: generate catalog instead of just printing this
+    logger.info('TIMESERIES_OUTPUT_ROOTDIR: %s' % TIMESERIES_OUTPUT_ROOTDIR)
 
 ################################################################################
 
