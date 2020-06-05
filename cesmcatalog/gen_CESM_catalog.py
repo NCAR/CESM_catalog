@@ -28,7 +28,7 @@ def _parse_args():
     """ Wrapper for argparse, returns dictionary of arguments """
 
     parser = argparse.ArgumentParser(
-        description="Generate intake-esm catalog for a CESM case",
+        description='Generate intake-esm catalog for a CESM case',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
@@ -65,7 +65,7 @@ def _find_data(case_root):
         sys.exit(1)
 
     run_config = dict()
-    for var in ['GET_REFCASE', 'RUN_REFCASE']:
+    for var in ['GET_REFCASE', 'RUN_REFCASE', 'RUN_REFDATE', 'RUN_STARTDATE']:
         run_config[var] = subprocess.check_output('./xmlquery --value {}'.format(var), shell=True)
     DOUT_S = subprocess.check_output('./xmlquery --value DOUT_S', shell=True)
     if DOUT_S == 'TRUE':
@@ -192,7 +192,7 @@ def gen_catalog(case_root):
 
 ################################################################################
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     logging.basicConfig(format='%(levelname)s (%(funcName)s): %(message)s', level=logging.DEBUG)
     args = _parse_args()
     # strip trailing / from case root (if user provides it)
