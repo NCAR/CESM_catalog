@@ -168,8 +168,8 @@ def _gen_timeseries_catalog(case_root, archive_root, run_config):
         catalog['parent_branch_year'] = entry_cnt * [-1]
         catalog['child_branch_year'] = entry_cnt * [-1]
 
-    logger.info('Creating {}...'.format(os.path.join(os.getcwd(), out_file)))
     pd.DataFrame(catalog).to_csv(out_file, index=False, columns=col_order, compression='gzip')
+    logger.info('Created {}'.format(os.path.join(os.getcwd(), out_file)))
 
 
 ################################################################################
