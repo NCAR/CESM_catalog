@@ -12,12 +12,12 @@
         https://github.com/NCAR/CESM_postprocessing/wiki/cheyenne-and-DAV-quick-start-guide
 """
 
-import os
-import sys
-import subprocess
-import logging
 import argparse
 import fnmatch
+import logging
+import os
+import subprocess
+import sys
 
 import pandas as pd
 
