@@ -187,7 +187,7 @@ def gen_catalog(case_root):
     if TIMESERIES_OUTPUT_ROOTDIR:
         _gen_timeseries_catalog(case_root, TIMESERIES_OUTPUT_ROOTDIR, run_config)
     else:  # only generate time slice catalog if time series not available
-        _gen_timeslice_catalog(case_root, DOUT_S, run_config)
+        _gen_timeslice_catalog(case_root, DOUT_S_ROOT, run_config)
 
 
 ################################################################################
