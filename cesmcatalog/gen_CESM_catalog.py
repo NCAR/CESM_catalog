@@ -19,8 +19,6 @@ import os
 import subprocess
 import sys
 
-import pandas as pd
-
 ################################################################################
 
 
@@ -99,6 +97,9 @@ def _gen_timeslice_catalog(case_root, archive_root, run_config):
 
 
 def _gen_timeseries_catalog(case_root, archive_root, run_config):
+    import pandas as pd
+    import xarray as xr
+
     # Set up logger
     # Define casename, file to create, and columns the catalog will contain
     logger = logging.getLogger(__name__)
@@ -109,6 +110,7 @@ def _gen_timeseries_catalog(case_root, archive_root, run_config):
         'component',
         'stream',
         'variable',
+        'long_name',
         'start_date',
         'end_date',
         'path',
@@ -116,6 +118,7 @@ def _gen_timeseries_catalog(case_root, archive_root, run_config):
         'child_branch_year',
         'parent_case',
     ]
+    long_name_dict = dict()
 
     # cd archive_root and make sure intake/ subdirectory exists (for output)
     os.chdir(archive_root)
@@ -146,15 +149,24 @@ def _gen_timeseries_catalog(case_root, archive_root, run_config):
 
             # Enough to determine stream, variable, start_date, and end_date
             catalog['stream'].append('.'.join(file_info[: date_ind - 1]))
-            catalog['variable'].append(file_info[date_ind - 1])
+            variable = file_info[date_ind - 1]
+            catalog['variable'].append(variable)
             date_range = info.split('-')
             catalog['start_date'].append(date_range[0])
             catalog['end_date'].append(date_range[1])
 
             # path should be relative to intake/, so we keep root
-            catalog['path'].append(os.path.join(root, ncfile))
+            path = os.path.join(root, ncfile)
+            catalog['path'].append(path)
             # component is the name of the subdirectory of archive_root
-            catalog['component'].append(catalog['path'][-1].split('/')[1])
+            component = path.split('/')[1]
+            catalog['component'].append(component)
+            if component not in long_name_dict:
+                long_name_dict[component] = dict()
+            if variable not in long_name_dict[component]:
+                ds = xr.open_dataset(path, decode_cf=False)
+                long_name_dict[component][variable] = ds[variable].attrs['long_name']
+            catalog['long_name'].append(long_name_dict[component][variable])
 
     # Columns that do not change by row
     entry_cnt = len(catalog['path'])
@@ -193,8 +205,9 @@ def gen_catalog(case_root):
 ################################################################################
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(levelname)s (%(funcName)s): %(message)s', level=logging.DEBUG)
     args = _parse_args()
+    log_level = logging.INFO
+    logging.basicConfig(format='%(levelname)s (%(funcName)s): %(message)s', level=log_level)
     # strip trailing / from case root (if user provides it)
     while args.case_root[-1] == '/':
         args.case_root = args.case_root[:-1]
