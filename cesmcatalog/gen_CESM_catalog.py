@@ -38,6 +38,13 @@ def _parse_args():
         required=True,
         help='CESM case root to generate intake-esm catalog for',
     )
+    parser.add_argument(
+        '-d',
+        '--debug',
+        action='store_true',
+        dest='debug',
+        help='Add additional output for debugging',
+    )
 
     return parser.parse_args()
 
@@ -206,7 +213,10 @@ def gen_catalog(case_root):
 
 if __name__ == '__main__':
     args = _parse_args()
-    log_level = logging.INFO
+    if args.debug:
+        log_level = logging.DEBUG
+    else:
+        log_level = logging.INFO
     logging.basicConfig(format='%(levelname)s (%(funcName)s): %(message)s', level=log_level)
     # strip trailing / from case root (if user provides it)
     while args.case_root[-1] == '/':
