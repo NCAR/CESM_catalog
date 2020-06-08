@@ -65,7 +65,7 @@ def _find_data(case_root):
         sys.exit(1)
 
     run_config = dict()
-    for var in ['GET_REFCASE', 'RUN_REFCASE', 'RUN_REFDATE', 'RUN_STARTDATE']:
+    for var in ['CASE', 'GET_REFCASE', 'RUN_REFCASE', 'RUN_REFDATE', 'RUN_STARTDATE']:
         run_config[var] = subprocess.check_output('./xmlquery --value {}'.format(var), shell=True)
     DOUT_S = subprocess.check_output('./xmlquery --value DOUT_S', shell=True)
     if DOUT_S == 'TRUE':
@@ -102,7 +102,7 @@ def _gen_timeseries_catalog(case_root, archive_root, run_config):
     # Set up logger
     # Define casename, file to create, and columns the catalog will contain
     logger = logging.getLogger(__name__)
-    casename = case_root.split('/')[-1]
+    casename = run_config['CASE']
     out_file = 'cesm_catalog.csv.gz'
     col_order = [
         'case',
@@ -131,7 +131,7 @@ def _gen_timeseries_catalog(case_root, archive_root, run_config):
 
     # Find each netcdf file in directory
     for root, dirs, files in os.walk('..'):
-        for ncfile in fnmatch.filter(files, '*.nc'):
+        for ncfile in fnmatch.filter(files, '{}*.nc'.format(casename)):
             # each file should be {casename}.{stream}.{variable}.{start_date}-{end_date}.nc
             # first we drop the leading {casename}.
             file_without_case = ncfile.replace(casename, '')[1:]
