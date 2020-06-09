@@ -75,11 +75,11 @@ def _find_data(case_root):
             subprocess.check_output('./xmlquery --value CIMEROOT', shell=True), 'scripts', 'Tools'
         )
     )
-    from standard_script_setup import *  # noqa: F406
+    import standard_script_setup  # noqa: F401 (used to get path to CIME.case in path)
     from CIME.case import Case
 
     run_config = dict()
-    with Case(case_root, read_only=False) as case:
+    with Case(case_root, read_only=True) as case:
         for var in ['CASE', 'GET_REFCASE', 'RUN_REFCASE', 'RUN_REFDATE', 'RUN_STARTDATE']:
             run_config[var] = case.get_value(var)
 
