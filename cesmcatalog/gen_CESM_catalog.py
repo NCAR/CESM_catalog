@@ -69,16 +69,26 @@ def _find_data(case_root):
         logger.error('Can not find xmlquery in {}'.format(case_root))
         sys.exit(1)
 
-    run_config = dict()
-    for var in ['CASE', 'GET_REFCASE', 'RUN_REFCASE', 'RUN_REFDATE', 'RUN_STARTDATE']:
-        run_config[var] = subprocess.check_output('./xmlquery --value {}'.format(var), shell=True)
-    DOUT_S = subprocess.check_output('./xmlquery --value DOUT_S', shell=True)
-    if DOUT_S == 'TRUE':
-        DOUT_S_ROOT = subprocess.check_output('./xmlquery --value DOUT_S_ROOT', shell=True)
-    else:
-        DOUT_S_ROOT = None
+    # 3. Load CIME libraries for access to case information
+    sys.path.append(
+        os.path.join(
+            subprocess.check_output('./xmlquery --value CIMEROOT', shell=True), 'scripts', 'Tools'
+        )
+    )
+    from standard_script_setup import *  # noqa: F406
+    from CIME.case import Case
 
-    # 3. If time series preprocess was used, pull out necessary config data
+    run_config = dict()
+    with Case(case_root, read_only=False) as case:
+        for var in ['CASE', 'GET_REFCASE', 'RUN_REFCASE', 'RUN_REFDATE', 'RUN_STARTDATE']:
+            run_config[var] = case.get_value(var)
+
+        if case.get_value('DOUT_S') == 'TRUE':
+            DOUT_S_ROOT = case.get_value('DOUT_S_ROOT')
+        else:
+            DOUT_S_ROOT = None
+
+    # 4. If time series preprocess was used, pull out necessary config data
     # TODO: how do we determine if we actually generated timeseries?
     if os.path.isdir('postprocess'):
         os.chdir('postprocess')
@@ -171,7 +181,7 @@ def _gen_timeseries_catalog(case_root, archive_root, run_config):
             if component not in long_name_dict:
                 long_name_dict[component] = dict()
             if variable not in long_name_dict[component]:
-                ds = xr.open_dataset(path, decode_cf=False)
+                ds = xr.open_dataset(path, decode_cf=False, chunks={})
                 long_name_dict[component][variable] = ds[variable].attrs['long_name']
             catalog['long_name'].append(long_name_dict[component][variable])
 
