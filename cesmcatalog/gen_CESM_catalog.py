@@ -32,12 +32,21 @@ def _parse_args():
 
     parser.add_argument(
         '-c',
-        '--case-root',
+        '--caseroot',
         action='store',
-        dest='case_root',
+        dest='caseroot',
         required=True,
         help='CESM case root to generate intake-esm catalog for',
     )
+
+    parser.add_argument(
+        '--cimeroot',
+        action='store',
+        dest='cimeroot',
+        required=False,
+        help='CIMEROOT variable from case root (will be determined via xmlquery if not provided)',
+    )
+
     parser.add_argument(
         '-d',
         '--debug',
@@ -52,34 +61,33 @@ def _parse_args():
 ################################################################################
 
 
-def _find_data(case_root):
+def _find_data(caseroot, cimeroot):
     logger = logging.getLogger(__name__)
 
-    # 1. change directory to case_root (if it exists)
+    # 1. change directory to caseroot (if it exists)
     try:
-        os.chdir(case_root)
+        os.chdir(caseroot)
     except:
         # TODO: set up logger instead of print statements
-        logger.error('{} does not exist'.format(case_root))
+        logger.error('{} does not exist'.format(caseroot))
         sys.exit(1)
 
     # 2. Collect info on where time slice output is
     if not os.path.isfile('./xmlquery'):
         # TODO: set up logger instead of print statements
-        logger.error('Can not find xmlquery in {}'.format(case_root))
+        logger.error('Can not find xmlquery in {}'.format(caseroot))
         sys.exit(1)
 
     # 3. Load CIME libraries for access to case information
-    sys.path.append(
-        os.path.join(
-            subprocess.check_output('./xmlquery --value CIMEROOT', shell=True), 'scripts', 'Tools'
-        )
-    )
+    if cimeroot is None:
+        cimeroot = subprocess.check_output('./xmlquery --value CIMEROOT', shell=True)
+    sys.path.append(os.path.join(cimeroot, 'scripts', 'Tools'))
+
     import standard_script_setup  # noqa: F401 (used to get path to CIME.case in path)
     from CIME.case import Case
 
     run_config = dict()
-    with Case(case_root, read_only=True) as case:
+    with Case(caseroot, read_only=True) as case:
         for var in ['CASE', 'GET_REFCASE', 'RUN_REFCASE', 'RUN_REFDATE', 'RUN_STARTDATE']:
             run_config[var] = case.get_value(var)
 
@@ -104,7 +112,7 @@ def _find_data(case_root):
 ################################################################################
 
 
-def _gen_timeslice_catalog(case_root, archive_root, run_config):
+def _gen_timeslice_catalog(caseroot, archive_root, run_config):
     # TODO: figure out how to generate catalog from time slice
     logger = logging.getLogger(__name__)
     logger.info('Will catalog files in {}'.format(archive_root))
@@ -113,7 +121,7 @@ def _gen_timeslice_catalog(case_root, archive_root, run_config):
 ################################################################################
 
 
-def _gen_timeseries_catalog(case_root, archive_root, run_config):
+def _gen_timeseries_catalog(caseroot, archive_root, run_config):
     import pandas as pd
     import xarray as xr
 
@@ -204,19 +212,19 @@ def _gen_timeseries_catalog(case_root, archive_root, run_config):
 ################################################################################
 
 
-def gen_catalog(case_root):
+def gen_catalog(caseroot, cimeroot):
     logger = logging.getLogger(__name__)
 
     # 1. Find where data is
-    run_config, DOUT_S_ROOT, TIMESERIES_OUTPUT_ROOTDIR = _find_data(case_root)
+    run_config, DOUT_S_ROOT, TIMESERIES_OUTPUT_ROOTDIR = _find_data(caseroot, cimeroot)
     if (DOUT_S_ROOT is None) and (TIMESERIES_OUTPUT_ROOTDIR is None):
-        logger.error('Error: can not find any data for {}'.format(case_root))
+        logger.error('Error: can not find any data for {}'.format(caseroot))
         sys.exit(1)
 
     if TIMESERIES_OUTPUT_ROOTDIR:
-        _gen_timeseries_catalog(case_root, TIMESERIES_OUTPUT_ROOTDIR, run_config)
+        _gen_timeseries_catalog(caseroot, TIMESERIES_OUTPUT_ROOTDIR, run_config)
     else:  # only generate time slice catalog if time series not available
-        _gen_timeslice_catalog(case_root, DOUT_S_ROOT, run_config)
+        _gen_timeslice_catalog(caseroot, DOUT_S_ROOT, run_config)
 
 
 ################################################################################
@@ -229,6 +237,6 @@ if __name__ == '__main__':
         log_level = logging.INFO
     logging.basicConfig(format='%(levelname)s (%(funcName)s): %(message)s', level=log_level)
     # strip trailing / from case root (if user provides it)
-    while args.case_root[-1] == '/':
-        args.case_root = args.case_root[:-1]
-    gen_catalog(args.case_root)
+    while args.caseroot[-1] == '/':
+        args.caseroot = args.caseroot[:-1]
+    gen_catalog(args.caseroot, args.cimeroot)
