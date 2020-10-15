@@ -1,23 +1,18 @@
 # cesmcatalog
 
-
-**cesmcatalog** is a wrapper layer for cesmcatalog_ and tools to generate catalogs of CESM output.
+**cesmcatalog** is a wrapper layer for cesmcatalog\_ and tools to generate catalogs of CESM output.
 
 See documentation for more information.
 
-
 ## Badges
 
-| CI           | [![GitHub Workflow Status][github-ci-badge]][github-ci-link] [![GitHub Workflow Status][github-lint-badge]][github-lint-link] [![Code Coverage Status][codecov-badge]][codecov-link] |
-| :----------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| **Docs**     |                                                                    [![Documentation Status][rtd-badge]][rtd-link]                                                                    |
-| **Package**  |                                                         [![Conda][conda-badge]][conda-link] [![PyPI][pypi-badge]][pypi-link]                                                         |
-| **License**  |                                                                        [![License][license-badge]][repo-link]                                                                        |
-
-
+| CI          | [![GitHub Workflow Status][github-ci-badge]][github-ci-link] [![GitHub Workflow Status][github-lint-badge]][github-lint-link] [![Code Coverage Status][codecov-badge]][codecov-link] |
+| :---------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| **Docs**    |                                                                    [![Documentation Status][rtd-badge]][rtd-link]                                                                    |
+| **Package** |                                                         [![Conda][conda-badge]][conda-link] [![PyPI][pypi-badge]][pypi-link]                                                         |
+| **License** |                                                                        [![License][license-badge]][repo-link]                                                                        |
 
 ## Installation(COMING SOON)
-
 
 cesmcatalog can be installed from PyPI with pip:
 
@@ -30,7 +25,6 @@ It is also available from `conda-forge` for conda installations:
 ```bash
 conda install -c conda-forge cesmcatalog
 ```
-
 
 [github-ci-badge]: https://img.shields.io/github/workflow/status/NCAR/cesm-catalog/CI?label=CI&logo=github&style=for-the-badge
 [github-lint-badge]: https://img.shields.io/github/workflow/status/NCAR/cesm-catalog/linting?label=linting&logo=github&style=for-the-badge
