@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 with open('requirements.txt') as f:
     INSTALL_REQUIREs = f.read().strip().split('\n')
-with open('README.rst', encoding='utf8') as f:
+with open('README.md', encoding='utf8') as f:
     LONG_DESCRIPTION = f.read()
 CLASSIFIERS = [
     'Development Status :: 4 - Beta',
@@ -21,18 +21,19 @@ CLASSIFIERS = [
 ]
 
 setup(
-    name='cesmcatalog',
-    description='cesmcatalog: a wrapper layer for intake-esm and tools to generate catalogs of CESM output.',
+    name='cesm-catalog',
+    description='cesm-catalog: a wrapper layer for intake-esm and tools to generate catalogs of CESM output.',
     long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/markdown',
     python_requires='>=3.6',
     maintainer='NCAR XDev Team',
     maintainer_email='xdev@ucar.edu',
     classifiers=CLASSIFIERS,
-    url='https://cesmcatalog.readthedocs.io',
+    url='https://cesm-catalog.readthedocs.io',
     project_urls={
-        'Documentation': 'https://cesmcatalog.readthedocs.io',
-        'Source': 'https://github.com/NCAR/CESM_catalog',
-        'Tracker': 'https://github.com/NCAR/CESM_catalog/issues',
+        'Documentation': 'https://cesm-catalog.readthedocs.io',
+        'Source': 'https://github.com/NCAR/cesm-catalog',
+        'Tracker': 'https://github.com/NCAR/cesm-catalog/issues',
     },
     packages=find_packages(exclude=('tests',)),
     include_package_data=True,
