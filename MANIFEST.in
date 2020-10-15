@@ -1,0 +1,14 @@
+include CHANGELOG.md
+include CONTRIBUTING.md
+include LICENSE
+include README.md
+include requirements.txt
+
+recursive-include docs/source *
+include docs/Makefile docs/make.bat
+recursive-include cesm_catalog *.yaml
+recursive-include cesm_catalog *.py
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+prune tests*
+prune ci*
