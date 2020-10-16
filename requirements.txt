@@ -1,2 +1,3 @@
 typer
 pandas
+netCDF4

@@ -2,8 +2,9 @@ name: cesmcatalog-dev
 channels:
   - conda-forge
 dependencies:
-  - typer
+  - netcdf4
   - pandas
+  - pre-commit
   - pytest
   - pytest-cov
-  - pre-commit
+  - typer
