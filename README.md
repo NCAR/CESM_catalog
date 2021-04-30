@@ -1,3 +1,6 @@
+#  ⚠️⚠️ The functionality for generating catalogs for CESM runs has been moved into <https://github.com/NCAR/ecgtools>. ⚠️⚠️
+
+
 # cesmcatalog
 
 **cesmcatalog** is a wrapper layer for cesmcatalog\_ and tools to generate catalogs of CESM output.
